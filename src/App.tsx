@@ -7,6 +7,7 @@ import Contact from './sections/Contact'
 import Footer from './sections/Footer'
 import AboutPage from './pages/AboutPage'
 import ServicesPage from './pages/ServicesPage'
+import ContactPage from './pages/ContactPage'
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/services" element={<ServicesPage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="*" element={<Navigate replace to="/" />} />
       </Routes>
     </BrowserRouter>

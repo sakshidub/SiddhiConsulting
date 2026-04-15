@@ -30,7 +30,7 @@ function Header() {
         <Button color="inherit" component={RouterLink} to="/services">
           Services
         </Button>
-        <Button color="inherit" component={RouterLink} to="/#contact">
+        <Button color="inherit" component={RouterLink} to="/contact">
           Contact
         </Button>
       </Toolbar>

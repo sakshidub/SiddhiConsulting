@@ -9,26 +9,46 @@ const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#1565c0',
-      contrastText: '#ffffff',
+      main: '#d4af37',
+      contrastText: '#0f172a',
     },
     secondary: {
-      main: '#ffc107',
-      contrastText: '#000000',
+      main: '#60a5fa',
+      contrastText: '#ffffff',
     },
     background: {
-      default: '#f4f8ff',
-      paper: '#ffffff',
+      default: '#ffffff',
+      paper: 'rgba(0,0,0,0.05)',
     },
     text: {
-      primary: '#1a237e',
-      secondary: '#424242',
+      primary: '#0f172a',
+      secondary: 'rgba(15,23,42,0.7)',
     },
   },
+
   typography: {
-    fontFamily: 'Roboto, Arial, sans-serif',
+    fontFamily: '"Inter", "Segoe UI", Roboto, sans-serif',
+    h1: { fontWeight: 700, letterSpacing: '-0.02em' },
+    h2: { fontWeight: 700, letterSpacing: '-0.01em' },
+    h3: { fontWeight: 600, letterSpacing: '-0.01em' },
+    h4: { fontWeight: 600 },
+    h5: { fontWeight: 600 },
+    h6: { fontWeight: 600 },
+    button: { fontWeight: 600, letterSpacing: '0.02em' },
+    overline: { fontWeight: 600, letterSpacing: '0.15em' },
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          backgroundColor: '#ffffff',
+          color: '#0f172a',
+        },
+      },
+    },
   },
 })
+
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -1,56 +1,105 @@
-import { Box, Container, Typography, Grid, Paper } from '@mui/material'
-import { Favorite, MilitaryTech, Groups, Radar } from '@mui/icons-material'
+import { Box, Container, Typography, Grid } from '@mui/material'
+import { Visibility, People, Lightbulb, Verified } from '@mui/icons-material'
 
 const values = [
   {
-    icon: <Radar sx={{ fontSize: 36, color: '#cb8b23' }} />,
-    title: 'Results-driven',
-    description: 'We measure success by the tangible outcomes we deliver for our clients.',
+    icon: <Visibility sx={{ fontSize: 36 }} />,
+    title: 'Clarity',
+    description:
+      'We provide clear insights and actionable recommendations that cut through complexity and drive confident decision-making.',
   },
   {
-    icon: <Favorite sx={{ fontSize: 36, color: '#cb8b23' }} />,
-    title: 'Client-focused',
-    description: 'Your goals become our goals. We prioritize understanding your unique needs.',
-  },
-  {
-    icon: <MilitaryTech sx={{ fontSize: 36, color: '#cb8b23' }} />,
-    title: 'Excellence',
-    description: 'We maintain the highest standards in every aspect of our service delivery.',
-  },
-  {
-    icon: <Groups sx={{ fontSize: 36, color: '#cb8b23' }} />,
+    icon: <People sx={{ fontSize: 36 }} />,
     title: 'Partnership',
-    description: 'We build lasting relationships based on trust, transparency, and mutual success.',
+    description:
+      'We treat every client relationship as a true partnership, invested in your success and committed to delivering exceptional value.',
+  },
+  {
+    icon: <Lightbulb sx={{ fontSize: 36 }} />,
+    title: 'Innovation',
+    description:
+      'We bring fresh perspectives and creative solutions to your most challenging business problems, helping you stay ahead of the curve.',
+  },
+  {
+    icon: <Verified sx={{ fontSize: 36 }} />,
+    title: 'Integrity',
+    description:
+      'We operate with the highest ethical standards, ensuring transparency and trust in every interaction and recommendation.',
   },
 ]
 
 function Values() {
   return (
-    <Box sx={{ py: 10, bgcolor: '#2d6f82', color: '#fff' }}>
+    <Box sx={{ bgcolor: '#0f172a', py: 10 }}>
       <Container maxWidth="lg">
-        <Box sx={{ textAlign: 'center', mb: 5 }}>
-          <Typography variant="h3" component="h2" gutterBottom sx={{ color: '#fff', fontWeight: 700 }}>
-            Our values
+        <Box sx={{ textAlign: 'center', mb: 6 }}>
+          <Typography
+            variant="overline"
+            sx={{
+              color: '#d4af37',
+              fontWeight: 600,
+              letterSpacing: 2,
+              fontSize: '0.85rem',
+            }}
+          >
+            Our Core Principles
           </Typography>
-          <Typography variant="subtitle1" sx={{ color: 'rgba(255,255,255,0.9)' }}>
-            These principles guide everything we do
+          <Typography
+            variant="h3"
+            component="h2"
+            gutterBottom
+            sx={{
+              color: '#fff',
+              fontWeight: 700,
+              mt: 1,
+              textShadow: '0 2px 20px rgba(0,0,0,0.5)',
+            }}
+          >
+            Values That Drive Us
           </Typography>
         </Box>
-
         <Grid container spacing={4}>
-          {values.map((value) => (
-            <Grid item xs={12} md={6} lg={3} key={value.title}>
-              <Paper sx={{ p: 4, borderRadius: 4, minHeight: 280, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', bgcolor: '#f7fbfd', border: '1px solid rgba(255,255,255,0.18)' }} elevation={3}>
-                <Box sx={{ width: 72, height: 72, borderRadius: 3, bgcolor: '#e8f2f7', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 3 }}>
-                  {value.icon}
+          {values.map((v) => (
+            <Grid item xs={12} sm={6} md={3} key={v.title}>
+              <Box
+                sx={{
+                  bgcolor: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  borderRadius: 3,
+                  p: 4,
+                  textAlign: 'center',
+                  height: '100%',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-6px)',
+                    bgcolor: 'rgba(255,255,255,0.06)',
+                    borderColor: 'rgba(212,175,55,0.2)',
+                  },
+                }}
+              >
+                <Box
+                  sx={{
+                    color: '#d4af37',
+                    mb: 2,
+                    display: 'inline-flex',
+                    p: 1.5,
+                    borderRadius: '50%',
+                    bgcolor: 'rgba(212,175,55,0.1)',
+                  }}
+                >
+                  {v.icon}
                 </Box>
-                <Typography variant="h6" component="h3" gutterBottom sx={{ color: '#1f4f5f', fontWeight: 700 }}>
-                  {value.title}
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{ color: '#fff', fontWeight: 600 }}
+                >
+                  {v.title}
                 </Typography>
-                <Typography variant="body2" sx={{ color: '#4a6973' }}>
-                  {value.description}
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.65)', lineHeight: 1.7 }}>
+                  {v.description}
                 </Typography>
-              </Paper>
+              </Box>
             </Grid>
           ))}
         </Grid>

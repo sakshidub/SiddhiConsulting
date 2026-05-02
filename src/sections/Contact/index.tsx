@@ -1,5 +1,5 @@
 import { Container, Grid, Box, Typography, IconButton, TextField, Button } from '@mui/material'
-import { Email, Phone, LocationOn, LinkedIn, Facebook, Instagram, WhatsApp } from '@mui/icons-material'
+import { Email, Phone, LocationOn, LinkedIn, Facebook, Instagram } from '@mui/icons-material'
 
 function Contact() {
   return (

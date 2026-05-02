@@ -93,7 +93,7 @@ function Contact() {
                   <Phone />
                 </IconButton>
                 <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.75rem' }}>
-                  +91 99050 64954
+                  +91 99050 64954 , +91 79822 85012
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -113,7 +113,7 @@ function Contact() {
                 </Typography>
               </Box>
 
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', mb: 2, mt: 1, display: 'block' }}>
+<Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', mb: 2, mt: 1, display: 'block', fontSize: '0.95rem' }}>
                 Follow us:
               </Typography>
               <Box sx={{ display: 'flex', gap: 1 }}>
@@ -150,17 +150,7 @@ function Contact() {
                 >
                   <Instagram />
                 </IconButton>
-                <IconButton
-                  href="https://wa.me/login"
-                  target="_blank"
-                  sx={{
-                    bgcolor: 'rgba(37,211,102,0.15)',
-                    color: '#25d366',
-                    '&:hover': { bgcolor: 'rgba(37,211,102,0.25)' },
-                  }}
-                >
-                  <WhatsApp />
-                </IconButton>
+                
               </Box>
             </Grid>
             <Grid item xs={12} md={6}>

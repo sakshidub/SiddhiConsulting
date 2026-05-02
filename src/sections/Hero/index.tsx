@@ -48,7 +48,7 @@ function Hero() {
             }}
           >
 
-            {/* Heading */}
+{/* Heading */}
             <Typography
               variant="h2"
               component="h1"
@@ -62,7 +62,27 @@ function Hero() {
                 opacity: 0,
               }}
             >
-              Welcome to Siddhi Consulting <br />
+              <Box
+                component="span"
+                sx={{
+                  background: 'linear-gradient(90deg, #2d7a4e, #5cb85c)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                Welcome to
+              </Box>{' '}
+              <Box
+                component="span"
+                sx={{
+                  background: 'linear-gradient(90deg, #d4af37, #f5c842)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                Siddhi Consulting
+              </Box>
+              <br />
               <Box
                 component="span"
                 sx={{

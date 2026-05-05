@@ -1,4 +1,4 @@
-import { Box, Container, Grid, Paper, Typography } from '@mui/material'
+import { Box, Button, Container, Grid, Paper, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import WorkIcon from "@mui/icons-material/Work";
 import {
@@ -73,41 +73,70 @@ function Expertise() {
           backgroundAttachment: 'fixed',
           zIndex: 0,
         },
-
       }}
     >
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-<Box sx={{ textAlign: 'center', mb: 4 }}>
-<Typography
-            variant="overline"
+        
+        {/* Header Section */}
+        <Box sx={{ textAlign: 'center', mb: 2, pt: 1 }}>
+          
+          {/* Caption + Button tightly grouped */}
+          <Box
             sx={{
-              color: '#2d7a4e',
-              fontWeight: 600,
-              letterSpacing: 2,
-              fontSize: '0.7rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 0.3,
             }}
           >
-            What We Do Best
-          </Typography>
-          <Typography
-            variant="h4"
-            component="h2"
-            gutterBottom
-            sx={{
-              color: '#0f172a',
-              fontWeight: 700,
-              mt: 0.5,
-              fontSize: '1.1rem',
-            }}
-          >
-            Our Expertise
-          </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                color: '#2d7a4e',
+                fontWeight: 600,
+                letterSpacing: 1.2,
+                fontSize: '0.6rem',
+              }}
+            >
+              What We Do Best
+            </Typography>
+
+            <Button
+              onClick={() => navigate('/expertise')}
+              sx={{
+                p: 0,
+                minHeight: 'auto',
+                color: 'inherit',
+                fontWeight: 600,
+                lineHeight: 1.1,
+                '&:hover': {
+                  bgcolor: 'transparent',
+                  color: '#d4af37',
+                },
+              }}
+            >
+              <Typography
+                component="span"
+                sx={{
+                  color: '#0f172a',
+                  fontWeight: 700,
+                  lineHeight: 1.15,
+                  fontSize: { xs: '1rem', sm: '1.1rem' },
+                }}
+              >
+                Our Expertise
+              </Typography>
+            </Button>
+          </Box>
+
+          {/* Description */}
           <Typography
             variant="body2"
             sx={{
               color: 'rgba(15,23,42,0.8)',
               maxWidth: 540,
               mx: 'auto',
+              mt: 1,
               lineHeight: 1.5,
               fontSize: '0.75rem',
             }}
@@ -115,13 +144,13 @@ function Expertise() {
             Decades of combined experience across industries, delivering
             transformative results for businesses at every stage of growth.
           </Typography>
-
         </Box>
 
+        {/* Cards */}
         <Grid container spacing={3}>
           {expertiseAreas.map((area) => (
-<Grid item xs={12} sm={6} lg={3} key={area.title}>
-<Paper
+            <Grid item xs={12} sm={6} lg={3} key={area.title}>
+              <Paper
                 elevation={0}
                 onClick={() => navigate('/expertise')}
                 sx={{
@@ -137,13 +166,11 @@ function Expertise() {
                   bgcolor: 'rgba(15,23,42,0.3)',
                   backdropFilter: 'blur(12px)',
                   border: '1px solid rgba(15,23,42,0.4)',
-
                   transition: 'all 0.3s ease',
                   '&:hover': {
                     transform: 'translateY(-6px)',
                     bgcolor: 'rgba(15,23,42,0.4)',
                     borderColor: 'rgba(212,175,55,0.4)',
-
                     boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
                   },
                 }}
@@ -162,22 +189,32 @@ function Expertise() {
                 >
                   {area.icon}
                 </Box>
+
                 <Typography
                   variant="body2"
                   component="h3"
                   gutterBottom
-                  sx={{ color: '#0f172a', fontWeight: 600, fontSize: '0.7rem' }}
+                  sx={{
+                    color: '#0f172a',
+                    fontWeight: 600,
+                    fontSize: '0.7rem',
+                  }}
                 >
                   {area.title}
                 </Typography>
+
                 <Typography
                   variant="caption"
-                  sx={{ color: 'rgba(15,23,42,0.8)', lineHeight: 1.4, flex: 1, fontSize: '0.6rem' }}
+                  sx={{
+                    color: 'rgba(15,23,42,0.8)',
+                    lineHeight: 1.4,
+                    flex: 1,
+                    fontSize: '0.6rem',
+                  }}
                 >
                   {area.description}
                 </Typography>
               </Paper>
-
             </Grid>
           ))}
         </Grid>
@@ -187,4 +224,3 @@ function Expertise() {
 }
 
 export default Expertise
-

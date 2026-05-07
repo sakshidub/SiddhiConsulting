@@ -120,7 +120,7 @@ function Contact() {
                   <Email />
                 </IconButton>
                 <Typography sx={{ color: '#fff' }}>
-                  siddhiconsultings@gmail.com
+                  info@siddhiconsulting.com
                 </Typography>
               </Box>
 

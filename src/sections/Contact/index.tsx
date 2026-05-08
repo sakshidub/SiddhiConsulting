@@ -143,7 +143,7 @@ function Contact() {
               </Box>
 
               <Box sx={{ mt: 2 }}>
-<IconButton href="https://linkedin.com" target="_blank" sx={{ color: '#0A66C2' }}>
+                  <IconButton href="https://linkedin.com" target="_blank" sx={{ color: '#0A66C2' }}>
                   <LinkedIn />
                 </IconButton>
                 <IconButton href="https://facebook.com" target="_blank" sx={{ color: '#1877F2' }}>

@@ -6,7 +6,8 @@ import {
   IconButton,
   TextField,
   Button,
-  Alert
+  Alert,
+  Snackbar
 } from '@mui/material'
 
 import {
@@ -19,15 +20,50 @@ import {
 } from '@mui/icons-material'
 
 import { useState } from 'react'
+import { send } from '@emailjs/browser'
 import bg from '../../assets/home4.webp'
 
 function Contact() {
   const [loading, setLoading] = useState(false)
   const [successMsg, setSuccessMsg] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
+  const [sentOk, setSentOk] = useState(false)
+  const [statusText, setStatusText] = useState('')
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'warning'>('success')
+  const [snackbarMessage, setSnackbarMessage] = useState('')
+
+  const emailjsServiceId = import.meta.env.VITE_EMAILJS_SERVICE_ID
+  const emailjsTemplateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+  const emailjsPublicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+
+  const isPlaceholderValue = (value: string | undefined) => {
+    if (!value) return true
+    const lower = value.toLowerCase()
+    return lower.includes('your_') || lower.includes('your') || lower.includes('placeholder') || lower.includes('xxxx')
+  }
+
+  const emailjsConfigured =
+    !!emailjsServiceId &&
+    !!emailjsTemplateId &&
+    !!emailjsPublicKey &&
+    !isPlaceholderValue(emailjsServiceId) &&
+    !isPlaceholderValue(emailjsTemplateId) &&
+    !isPlaceholderValue(emailjsPublicKey)
+
+  const emailjsStatusMessage = emailjsConfigured
+    ? 'EmailJS is configured and ready to send to siddhiconsultings@gmail.com.'
+    : 'EmailJS is not configured correctly. Please set VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, and VITE_EMAILJS_PUBLIC_KEY in .env.'
+
+  const showAlerts = import.meta.env.VITE_SHOW_CONTACT_ALERTS === 'true'
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api')
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
+    setSuccessMsg('')
+    setErrorMsg('')
+    setStatusText('')
 
     const form = e.currentTarget
 
@@ -43,27 +79,90 @@ function Contact() {
       message: elements.message.value
     }
 
+    const emailjsReady =
+      !!emailjsServiceId &&
+      !!emailjsTemplateId &&
+      !!emailjsPublicKey &&
+      !isPlaceholderValue(emailjsServiceId) &&
+      !isPlaceholderValue(emailjsTemplateId) &&
+      !isPlaceholderValue(emailjsPublicKey)
+
+    let backendSaved = false
     try {
-      const res = await fetch('http://localhost:5000/api/contact', {
+      const saveRes = await fetch(`${apiBaseUrl}/contact`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
-
-      const data = await res.json()
-
-      if (res.ok) {
-        setSuccessMsg('message send')
-        form.reset()
-        setTimeout(() => setSuccessMsg(''), 5000)
+      if (saveRes.ok) {
+        backendSaved = true
+        console.log('Contact saved to backend')
       } else {
-        alert(data.message || 'Failed to send')
+        const errorText = await saveRes.text().catch(() => '')
+        console.warn('Failed to save contact to backend:', saveRes.status, errorText)
       }
+    } catch (saveError) {
+      console.warn('Backend save error:', saveError)
+    }
+
+    if (!emailjsReady) {
+      const mailto = `mailto:siddhiconsultings@gmail.com?subject=${encodeURIComponent(
+        `Contact from ${formData.name}`
+      )}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\nMessage: ${formData.message}`)}`
+      window.location.href = mailto
+      const message = backendSaved
+        ? 'Saved to contact.json and opening your email client.'
+        : 'Opening your email client. Backend save failed.'
+      setStatusText(message)
+      setSnackbarSeverity(backendSaved ? 'success' : 'warning')
+      setSnackbarMessage(message)
+      setSnackbarOpen(true)
+      setLoading(false)
+      return
+    }
+
+    try {
+      await send(
+        emailjsServiceId,
+        emailjsTemplateId,
+        {
+          user_name: formData.name,
+          user_email: formData.email,
+          message: formData.message,
+          from_name: formData.name,
+          from_email: formData.email,
+          to_email: 'siddhiconsultings@gmail.com'
+        },
+        emailjsPublicKey
+      )
+
+      const successMessage = backendSaved
+        ? 'Email sent and saved to contact.json.'
+        : 'Email sent, but saving to contact.json failed.'
+      setSuccessMsg('Message sent successfully to siddhiconsultings@gmail.com')
+      setStatusText(successMessage)
+      setSnackbarSeverity('success')
+      setSnackbarMessage(successMessage)
+      setSnackbarOpen(true)
+      form.reset()
+      setSentOk(true)
+      setTimeout(() => setSentOk(false), 5000)
+      setTimeout(() => setSuccessMsg(''), 7000)
     } catch (error) {
-      console.error(error)
-      alert('Server error')
+      console.error('Contact form submit failed:', error)
+      const message =
+        error instanceof Error
+          ? error.message
+          : typeof error === 'string'
+          ? error
+          : error && typeof error === 'object'
+          ? JSON.stringify(error)
+          : 'Failed to send message'
+      setErrorMsg(message)
+      setStatusText(message)
+      setSnackbarSeverity('error')
+      setSnackbarMessage(message)
+      setSnackbarOpen(true)
     }
 
     setLoading(false)
@@ -192,21 +291,63 @@ function Contact() {
                   variant="contained"
                   disabled={loading}
                   sx={{
-                    bgcolor: '#43a249',
-                    '&:hover': { bgcolor: '#2e7d32' }
+                    bgcolor: sentOk ? '#2e7d32' : '#43a249',
+                    '&:hover': { bgcolor: sentOk ? '#1b5e20' : '#2e7d32' }
                   }}
                 >
-                  {loading ? 'Sending...' : 'Send Message'}
+                  {loading ? 'Sending...' : sentOk ? 'Sent ✓' : 'Send Message'}
                 </Button>
 
-                {successMsg && (
+                {(showAlerts || statusText) && (
+                  <Typography
+                    variant="body2"
+                    sx={{ mt: 2, color: statusText ? '#fff' : '#f5c518' }}
+                  >
+                    {statusText || emailjsStatusMessage}
+                  </Typography>
+                )}
+
+                {showAlerts && successMsg && (
                   <Alert 
                     severity="success" 
-                    sx={{ mt: 2, animation: 'fadeIn 0.5s' }}
+                    sx={{ mt: 2, animation: 'fadeIn 0.5s', position: 'relative', zIndex: 'auto' }}
                   >
                     {successMsg}
                   </Alert>
                 )}
+
+                {showAlerts && successMsg && (
+                  <Alert 
+                    severity="success" 
+                    sx={{ mt: 2, animation: 'fadeIn 0.5s', position: 'relative', zIndex: 'auto' }}
+                  >
+                    {successMsg}
+                  </Alert>
+                )}
+
+                {showAlerts && errorMsg && (
+                  <Alert 
+                    severity="error" 
+                    sx={{ mt: 2, animation: 'fadeIn 0.5s', position: 'relative', zIndex: 'auto' }}
+                  >
+                    {errorMsg}
+                  </Alert>
+                )}
+
+                <Snackbar
+                  open={snackbarOpen}
+                  autoHideDuration={5000}
+                  onClose={() => setSnackbarOpen(false)}
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                >
+                  <Alert
+                    onClose={() => setSnackbarOpen(false)}
+                    severity={snackbarSeverity}
+                    sx={{ width: '100%' }}
+                  >
+                    {snackbarMessage}
+                  </Alert>
+                </Snackbar>
 
               </form>
             </Grid>

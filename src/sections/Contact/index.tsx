@@ -12,7 +12,7 @@ import {
 import {
   Email,
   Phone,
- LocationOn,
+  LocationOn,
   LinkedIn,
   Facebook,
   Instagram
@@ -40,12 +40,12 @@ function Contact() {
 
     const formData = new FormData(form)
 
-    // disable captcha
+    // Disable captcha
     formData.append('_captcha', 'false')
 
     try {
       const response = await fetch(
-        'https://formsubmit.co/ajax/info@siddhiconsulting.com',
+        'https://formsubmit.co/ajax/sakshidubey1225@gmail.com',
         {
           method: 'POST',
           headers: {
@@ -298,7 +298,7 @@ function Contact() {
                   }}
                 >
                   {loading
-                    ? 'Sending...'
+                    ? 'SENDING...'
                     : 'SEND MESSAGE'}
                 </Button>
 

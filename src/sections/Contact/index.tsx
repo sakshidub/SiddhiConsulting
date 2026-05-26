@@ -6,166 +6,80 @@ import {
   IconButton,
   TextField,
   Button,
-  Alert,
-  Snackbar
+  Alert
 } from '@mui/material'
 
 import {
   Email,
   Phone,
-  LocationOn,
+ LocationOn,
   LinkedIn,
   Facebook,
   Instagram
 } from '@mui/icons-material'
 
 import { useState } from 'react'
-import { send } from '@emailjs/browser'
+
 import bg from '../../assets/home4.webp'
 
 function Contact() {
   const [loading, setLoading] = useState(false)
-  const [successMsg, setSuccessMsg] = useState('')
-  const [errorMsg, setErrorMsg] = useState('')
-  const [sentOk, setSentOk] = useState(false)
-  const [statusText, setStatusText] = useState('')
-  const [snackbarOpen, setSnackbarOpen] = useState(false)
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'warning'>('success')
-  const [snackbarMessage, setSnackbarMessage] = useState('')
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState(false)
 
-  const emailjsServiceId = import.meta.env.VITE_EMAILJS_SERVICE_ID
-  const emailjsTemplateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
-  const emailjsPublicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-
-  const isPlaceholderValue = (value: string | undefined) => {
-    if (!value) return true
-    const lower = value.toLowerCase()
-    return lower.includes('your_') || lower.includes('your') || lower.includes('placeholder') || lower.includes('xxxx')
-  }
-
-  const emailjsConfigured =
-    !!emailjsServiceId &&
-    !!emailjsTemplateId &&
-    !!emailjsPublicKey &&
-    !isPlaceholderValue(emailjsServiceId) &&
-    !isPlaceholderValue(emailjsTemplateId) &&
-    !isPlaceholderValue(emailjsPublicKey)
-
-  const emailjsStatusMessage = emailjsConfigured
-    ? 'EmailJS is configured and ready to send to siddhiconsultings@gmail.com.'
-    : 'EmailJS is not configured correctly. Please set VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, and VITE_EMAILJS_PUBLIC_KEY in .env.'
-
-  const showAlerts = import.meta.env.VITE_SHOW_CONTACT_ALERTS === 'true'
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api')
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault()
+
     setLoading(true)
-    setSuccessMsg('')
-    setErrorMsg('')
-    setStatusText('')
+    setSuccess(false)
+    setError(false)
 
     const form = e.currentTarget
 
-    const elements = form.elements as unknown as {
-      name: HTMLInputElement
-      email: HTMLInputElement
-      message: HTMLTextAreaElement
-    }
+    const formData = new FormData(form)
 
-    const formData = {
-      name: elements.name.value,
-      email: elements.email.value,
-      message: elements.message.value
-    }
-
-    const emailjsReady =
-      !!emailjsServiceId &&
-      !!emailjsTemplateId &&
-      !!emailjsPublicKey &&
-      !isPlaceholderValue(emailjsServiceId) &&
-      !isPlaceholderValue(emailjsTemplateId) &&
-      !isPlaceholderValue(emailjsPublicKey)
-
-    let backendSaved = false
-    try {
-      const saveRes = await fetch(`${apiBaseUrl}/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      })
-      if (saveRes.ok) {
-        backendSaved = true
-        console.log('Contact saved to backend')
-      } else {
-        const errorText = await saveRes.text().catch(() => '')
-        console.warn('Failed to save contact to backend:', saveRes.status, errorText)
-      }
-    } catch (saveError) {
-      console.warn('Backend save error:', saveError)
-    }
-
-    if (!emailjsReady) {
-      const mailto = `mailto:siddhiconsultings@gmail.com?subject=${encodeURIComponent(
-        `Contact from ${formData.name}`
-      )}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\nMessage: ${formData.message}`)}`
-      window.location.href = mailto
-      const message = backendSaved
-        ? 'Saved to contact.json and opening your email client.'
-        : 'Opening your email client. Backend save failed.'
-      setStatusText(message)
-      setSnackbarSeverity(backendSaved ? 'success' : 'warning')
-      setSnackbarMessage(message)
-      setSnackbarOpen(true)
-      setLoading(false)
-      return
-    }
+    // disable captcha
+    formData.append('_captcha', 'false')
 
     try {
-      await send(
-        emailjsServiceId,
-        emailjsTemplateId,
+      const response = await fetch(
+        'https://formsubmit.co/ajax/info@siddhiconsulting.com',
         {
-          user_name: formData.name,
-          user_email: formData.email,
-          message: formData.message,
-          from_name: formData.name,
-          from_email: formData.email,
-          to_email: 'siddhiconsultings@gmail.com'
-        },
-        emailjsPublicKey
+          method: 'POST',
+          headers: {
+            Accept: 'application/json'
+          },
+          body: formData
+        }
       )
 
-      const successMessage = backendSaved
-        ? 'Email sent and saved to contact.json.'
-        : 'Email sent, but saving to contact.json failed.'
-      setSuccessMsg('Message sent successfully to siddhiconsultings@gmail.com')
-      setStatusText(successMessage)
-      setSnackbarSeverity('success')
-      setSnackbarMessage(successMessage)
-      setSnackbarOpen(true)
-      form.reset()
-      setSentOk(true)
-      setTimeout(() => setSentOk(false), 5000)
-      setTimeout(() => setSuccessMsg(''), 7000)
-    } catch (error) {
-      console.error('Contact form submit failed:', error)
-      const message =
-        error instanceof Error
-          ? error.message
-          : typeof error === 'string'
-          ? error
-          : error && typeof error === 'object'
-          ? JSON.stringify(error)
-          : 'Failed to send message'
-      setErrorMsg(message)
-      setStatusText(message)
-      setSnackbarSeverity('error')
-      setSnackbarMessage(message)
-      setSnackbarOpen(true)
-    }
+      const data = await response.json()
 
-    setLoading(false)
+      console.log(data)
+
+      // SUCCESS
+      if (data.success) {
+        setSuccess(true)
+
+        alert('Mail Sent Successfully!')
+
+        form.reset()
+      } else {
+        setError(true)
+
+        alert('Failed to send message')
+      }
+    } catch (err) {
+      console.error(err)
+
+      setError(true)
+
+      alert('Failed to send message')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -174,11 +88,21 @@ function Contact() {
       sx={{
         position: 'relative',
         py: 10,
+
         '&::before': {
           content: '""',
           position: 'absolute',
           inset: 0,
-          backgroundImage: `linear-gradient(to bottom, rgba(15,23,42,0.92), rgba(15,23,42,0.85)), url(${bg})`,
+
+          backgroundImage: `
+            linear-gradient(
+              to bottom,
+              rgba(15,23,42,0.92),
+              rgba(15,23,42,0.85)
+            ),
+            url(${bg})
+          `,
+
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'fixed',
@@ -186,18 +110,43 @@ function Contact() {
         }
       }}
     >
-      <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
-        
-        {/* Heading */}
-        <Box sx={{ textAlign: 'center', mb: 6 }}>
-          <Typography sx={{ color: '#d4af37', fontSize: '0.7rem' }}>
-            Get In Touch
+      <Container
+        maxWidth="md"
+        sx={{
+          position: 'relative',
+          zIndex: 1
+        }}
+      >
+        {/* HEADING */}
+        <Box
+          sx={{
+            textAlign: 'center',
+            mb: 6
+          }}
+        >
+          <Typography
+            sx={{
+              color: '#d4af37',
+              fontSize: '0.8rem',
+              letterSpacing: 2,
+              mb: 1
+            }}
+          >
+            GET IN TOUCH
           </Typography>
-          <Typography sx={{ color: '#fff', fontWeight: 700 }}>
+
+          <Typography
+            variant="h4"
+            sx={{
+              color: '#fff',
+              fontWeight: 700
+            }}
+          >
             Contact Us
           </Typography>
         </Box>
 
+        {/* MAIN BOX */}
         <Box
           sx={{
             bgcolor: 'rgba(255,255,255,0.05)',
@@ -207,57 +156,102 @@ function Contact() {
           }}
         >
           <Grid container spacing={4}>
-            
-            {/* LEFT */}
+            {/* LEFT SIDE */}
             <Grid item xs={12} md={6}>
-              <Typography sx={{ color: '#fff', mb: 2 }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: '#fff',
+                  mb: 3,
+                  fontWeight: 600
+                }}
+              >
                 Get in Touch
               </Typography>
 
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              {/* EMAIL */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  mb: 2
+                }}
+              >
                 <IconButton sx={{ color: '#d4af37' }}>
                   <Email />
                 </IconButton>
+
                 <Typography sx={{ color: '#fff' }}>
                   info@siddhiconsulting.com
                 </Typography>
               </Box>
 
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              {/* PHONE */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  mb: 2
+                }}
+              >
                 <IconButton sx={{ color: '#d4af37' }}>
                   <Phone />
                 </IconButton>
+
                 <Typography sx={{ color: '#fff' }}>
-                  +91 99050 64954 , +91 79822 85012
+                  +91 99050 64954, +91 79822 85012
                 </Typography>
               </Box>
 
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              {/* ADDRESS */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  mb: 2
+                }}
+              >
                 <IconButton sx={{ color: '#d4af37' }}>
                   <LocationOn />
                 </IconButton>
+
                 <Typography sx={{ color: '#fff' }}>
                   G-31 First Floor Sector 3 Noida, UP
                 </Typography>
               </Box>
 
-              <Box sx={{ mt: 2 }}>
-                  <IconButton href="https://linkedin.com" target="_blank" sx={{ color: '#0A66C2' }}>
+              {/* SOCIAL ICONS */}
+              <Box sx={{ mt: 3 }}>
+                <IconButton
+                  href="https://linkedin.com"
+                  target="_blank"
+                  sx={{ color: '#0A66C2' }}
+                >
                   <LinkedIn />
                 </IconButton>
-                <IconButton href="https://facebook.com" target="_blank" sx={{ color: '#1877F2' }}>
+
+                <IconButton
+                  href="https://facebook.com"
+                  target="_blank"
+                  sx={{ color: '#1877F2' }}
+                >
                   <Facebook />
                 </IconButton>
-                <IconButton href="https://instagram.com" target="_blank" sx={{ color: '#E4405F' }}>
+
+                <IconButton
+                  href="https://instagram.com"
+                  target="_blank"
+                  sx={{ color: '#E4405F' }}
+                >
                   <Instagram />
                 </IconButton>
               </Box>
             </Grid>
 
-            {/* RIGHT FORM */}
+            {/* RIGHT SIDE FORM */}
             <Grid item xs={12} md={6}>
               <form onSubmit={handleSubmit}>
-                
+                {/* NAME */}
                 <TextField
                   fullWidth
                   name="name"
@@ -266,6 +260,7 @@ function Contact() {
                   sx={{ mb: 2 }}
                 />
 
+                {/* EMAIL */}
                 <TextField
                   fullWidth
                   name="email"
@@ -275,6 +270,7 @@ function Contact() {
                   sx={{ mb: 2 }}
                 />
 
+                {/* MESSAGE */}
                 <TextField
                   fullWidth
                   name="message"
@@ -285,73 +281,48 @@ function Contact() {
                   sx={{ mb: 2 }}
                 />
 
+                {/* BUTTON */}
                 <Button
                   type="submit"
                   fullWidth
                   variant="contained"
                   disabled={loading}
                   sx={{
-                    bgcolor: sentOk ? '#2e7d32' : '#43a249',
-                    '&:hover': { bgcolor: sentOk ? '#1b5e20' : '#2e7d32' }
+                    bgcolor: '#43a249',
+                    py: 1.3,
+                    fontWeight: 600,
+
+                    '&:hover': {
+                      bgcolor: '#2e7d32'
+                    }
                   }}
                 >
-                  {loading ? 'Sending...' : sentOk ? 'Sent ✓' : 'Send Message'}
+                  {loading
+                    ? 'Sending...'
+                    : 'SEND MESSAGE'}
                 </Button>
 
-                {(showAlerts || statusText) && (
-                  <Typography
-                    variant="body2"
-                    sx={{ mt: 2, color: statusText ? '#fff' : '#f5c518' }}
-                  >
-                    {statusText || emailjsStatusMessage}
-                  </Typography>
-                )}
-
-                {showAlerts && successMsg && (
-                  <Alert 
-                    severity="success" 
-                    sx={{ mt: 2, animation: 'fadeIn 0.5s', position: 'relative', zIndex: 'auto' }}
-                  >
-                    {successMsg}
-                  </Alert>
-                )}
-
-                {showAlerts && successMsg && (
-                  <Alert 
-                    severity="success" 
-                    sx={{ mt: 2, animation: 'fadeIn 0.5s', position: 'relative', zIndex: 'auto' }}
-                  >
-                    {successMsg}
-                  </Alert>
-                )}
-
-                {showAlerts && errorMsg && (
-                  <Alert 
-                    severity="error" 
-                    sx={{ mt: 2, animation: 'fadeIn 0.5s', position: 'relative', zIndex: 'auto' }}
-                  >
-                    {errorMsg}
-                  </Alert>
-                )}
-
-                <Snackbar
-                  open={snackbarOpen}
-                  autoHideDuration={5000}
-                  onClose={() => setSnackbarOpen(false)}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                >
+                {/* SUCCESS ALERT */}
+                {success && (
                   <Alert
-                    onClose={() => setSnackbarOpen(false)}
-                    severity={snackbarSeverity}
-                    sx={{ width: '100%' }}
+                    severity="success"
+                    sx={{ mt: 2 }}
                   >
-                    {snackbarMessage}
+                    Message sent successfully!
                   </Alert>
-                </Snackbar>
+                )}
 
+                {/* ERROR ALERT */}
+                {error && (
+                  <Alert
+                    severity="error"
+                    sx={{ mt: 2 }}
+                  >
+                    Failed to send message.
+                  </Alert>
+                )}
               </form>
             </Grid>
-
           </Grid>
         </Box>
       </Container>

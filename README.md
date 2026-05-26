@@ -26,38 +26,19 @@ A modern, responsive portfolio website for Siddhi Consulting built with React, T
 
 ### Development
 
-Start the project:
-```bash
-npm install
-npm run dev
-```
-
-This launches the Vite frontend on `http://localhost:5173`.
-
-The contact form now saves submissions to `backend/contacts.json` when the backend is running. It also sends email directly from the frontend through EmailJS. If EmailJS is not configured, it falls back to opening your email client using a mailto link.
-
-If you want to run only the backend (for other features):
-```bash
-cd backend
-npm run dev
-```
-
-### Frontend email setup
-
-1. Copy `.env.example` to `.env`
-2. Replace the placeholder values with the real values from your EmailJS dashboard:
-   - `VITE_EMAILJS_SERVICE_ID`
-   - `VITE_EMAILJS_TEMPLATE_ID`
-   - `VITE_EMAILJS_PUBLIC_KEY`
-
-   Make sure you are using the public key shown in EmailJS, not a service or template ID.
-
-3. Start the frontend:
+Start the development server:
 ```bash
 npm run dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173) to view the website in your browser.
+
+> Note: the contact form uses a relative `/api/contact` path. In development, Vite proxies `/api` to `http://localhost:5000`.
+
+If you want to override the backend URL, copy `.env.example` to `.env` and set:
+```env
+VITE_API_URL=http://localhost:5000
+```
 
 ### Build
 
